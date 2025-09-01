@@ -59,25 +59,25 @@ h1 {
 
 /* Ciclo Básico (verde) */
 #ciclo-basico {
-    background-color: #28a745;
+    background-color: #b60909;
 }
 
 #ciclo-basico:hover {
-    background-color: #218838;
+    background-color: #880808;
 }
 
 /* Ciclo Orientado (azul) */
 #ciclo-orientado {
-    background-color: #007bff;
-}
+    background-color: rgb(4, 75, 151);
+}   
 
 #ciclo-orientado:hover {
-    background-color: #0056b3;
+    background-color: rgb(1, 56, 116);
 }
 
 /* Deportes Ciclo Básico (verde) */
 .deporte.basico {
-    background-color: #28a745;
+    background-color: #b60909;
     color: white;
     padding: 10px;
     margin: 5px 0;
@@ -88,12 +88,12 @@ h1 {
 }
 
 .deporte.basico:hover {
-    background-color: #218838;
+    background-color: #880808;
 }
 
 /* Deportes Ciclo Orientado (azul) */
 .deporte.orientado {
-    background-color: #007bff;
+    background-color: rgb(4, 75, 151);
     color: white;
     padding: 10px;
     margin: 5px 0;
@@ -104,7 +104,7 @@ h1 {
 }
 
 .deporte.orientado:hover {
-    background-color: #0056b3;
+    background-color: rgb(1, 56, 116);
 }
 
 .deportes, .fixture {
