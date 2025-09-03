@@ -5,11 +5,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Jornada Deportiva</title>
     <link rel="shortcut icon" href="./img/ijp.jpg" type="image/x-icon">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+
+    <div id="countdown-overlay">
+    <h1 class="countdown-title">🏆 Jornada Deportiva</h1>
+    <div id="countdown" class="countdown-timer"></div>
+</div>
+
+
     <div class="container">
-        <h1>Jornada Deportiva</h1>
+        <h1><span class="icon">🏆</span> Jornada Deportiva<span class="icon">🏆</span></h1>
         <div class="ciclos">
             <div class="ciclo" id="ciclo-basico">
                 <h2>Ciclo Básico</h2>
@@ -21,7 +29,7 @@
         <div id="deportes" class="deportes"></div>
         <div id="fixture" class="fixture"></div>
     </div>
-    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
     <script src="script.js"></script>
 </body>
 </html>
