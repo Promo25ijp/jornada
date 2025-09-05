@@ -2,7 +2,7 @@ const countdownOverlay = document.getElementById('countdown-overlay');
 const countdownEl = document.getElementById('countdown');
 const mainContent = document.querySelector('.container');
 
-const fechaEvento = new Date('2025-09-05T07:00:00');
+const fechaEvento = new Date('2025-09-17T07:00:00');
 
 function actualizarCuentaRegresiva() {
     const ahora = new Date();
