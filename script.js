@@ -49,7 +49,6 @@ function toggleDeportes(nivel) {
         cicloActivo = nivel;
         container.classList.add('expanded');
         loadDeportes(nivel);
-        // Cerrar la tabla al cambiar de ciclo (corrección 2)
         fixtureContainer.innerHTML = '';
         fixtureContainer.style.display = 'none';
     }
@@ -63,6 +62,7 @@ function loadDeportes(nivel) {
         { nombre: "Fútbol femenino", emoji: "⚽" },
         { nombre: "Vóley", emoji: "🏐" },
         { nombre: "Handball", emoji: "🤾" },
+        { nombre: "Básquet", emoji: "🏀" },
         { nombre: "Pata Tenis", emoji: "👟" },
         { nombre: "Torneo de Counter Strike", emoji: "🔫" },
         { nombre: "Show de talentos", emoji: "🌟" },
@@ -75,7 +75,6 @@ function loadDeportes(nivel) {
         div.innerHTML = `<span>${deporte.emoji} ${deporte.nombre}</span>`;
         div.addEventListener('click', () => {
             loadFixture(nivel, deporte.nombre);
-            // Llevar scroll hasta la tabla (corrección 1)
             setTimeout(() => {
                 fixtureContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
             }, 350);
@@ -101,61 +100,112 @@ function loadFixture(nivel, deporte) {
     fixtureContainer.innerHTML = '<div style="text-align: center; padding: 20px;"><div class="loading"></div></div>';
     fixtureContainer.style.display = 'block';
 
-    const apiURL = 'https://script.google.com/macros/s/AKfycbxxmzfbYD1Oc7pB0Xnl4hfyhx5J6ACQtM524iuUP7js0RfqFCKGfAVK5245OQBJ-2Ed/exec';
+    const apiURL = 'https://script.google.com/macros/s/AKfycbywb_9ztAsdJlGg-Djxw7BVE3lOIopMEdsyJSliYkP9V-d90q7X2Pnb9SSwGQsPv2Vd/exec'; // 👈 pegá tu URL de Apps Script publicado
 
     const renderFixture = (data) => {
-        const fixture = data.filter(item =>
-            normalize(item.Nivel) === normalize(nivel) &&
-            normalize(item.Deporte) === normalize(deporte)
-        );
+        let fixture = [];
 
-        if (fixture.length === 0) {
-            fixtureContainer.innerHTML = '<div style="text-align: center; padding: 30px; color: #666; font-size: 1.1rem;">📅 No hay partidos programados para este deporte y nivel.</div>';
-            return;
-        }
+        if (normalize(deporte) === normalize("Show de talentos")) {
+            // 🔹 Buscar en la hoja talentos
+            fixture = data.talentos.filter(item =>
+                normalize(item.Nivel) === normalize(nivel)
+            );
 
-        const table = document.createElement('table');
-        table.classList.add('fixture-table');
+            if (fixture.length === 0) {
+                fixtureContainer.innerHTML = '<div style="text-align: center; padding: 30px; color: #666; font-size: 1.1rem;">📅 No hay presentaciones programadas para este nivel.</div>';
+                return;
+            }
 
-        const headerRow = document.createElement('tr');
-        const thColor = nivel === 'basico'
-            ? 'linear-gradient(135deg, #044b97, #3742fa)'
-            : 'linear-gradient(135deg, #b60909, #ff4757)';
+            // Crear tabla para talentos
+            const table = document.createElement('table');
+            table.classList.add('fixture-table');
 
-        ['🕐 Hora', 'Equipo 1', 'Equipo 2', '📍 Lugar', '🏆 Ganador'].forEach(text => {
-            const th = document.createElement('th');
-            th.innerText = text;
-            th.style.background = thColor;
-            headerRow.appendChild(th);
-        });
+            const headerRow = document.createElement('tr');
+            const thColor = nivel === 'basico'
+                ? 'linear-gradient(135deg, #044b97, #3742fa)'
+                : 'linear-gradient(135deg, #b60909, #ff4757)';
 
-        table.appendChild(headerRow);
-
-        fixture.forEach(match => {
-            const row = document.createElement('tr');
-            const hora = formatHora(match.Hora);
-            [hora, match.equipo1, match.equipo2, match.Lugar, match.Ganador || '-'].forEach((value, index) => {
-                const td = document.createElement('td');
-
-                if (index === 4 && value !== '-') {
-                    td.style.fontWeight = 'bold';
-                    td.style.color = '#27ae60';
-                    td.innerHTML = `🏆 ${value}`;
-                } else {
-                    td.innerText = value;
-                }
-
-                row.appendChild(td);
+            ['🕐 Hora', 'Nombre/Grupo', '📍 Lugar'].forEach(text => {
+                const th = document.createElement('th');
+                th.innerText = text;
+                th.style.background = thColor;
+                headerRow.appendChild(th);
             });
 
-            table.appendChild(row);
-        });
+            table.appendChild(headerRow);
 
-        const tableWrapper = document.createElement('div');
-        tableWrapper.classList.add('fixture-table-container');
-        tableWrapper.appendChild(table);
-        fixtureContainer.innerHTML = '';
-        fixtureContainer.appendChild(tableWrapper);
+            fixture.forEach(show => {
+                const row = document.createElement('tr');
+                const hora = formatHora(show.Hora);
+                [hora, show["Nombre/Grupo"], show.Lugar].forEach(value => {
+                    const td = document.createElement('td');
+                    td.innerText = value;
+                    row.appendChild(td);
+                });
+                table.appendChild(row);
+            });
+
+            const tableWrapper = document.createElement('div');
+            tableWrapper.classList.add('fixture-table-container');
+            tableWrapper.appendChild(table);
+            fixtureContainer.innerHTML = '';
+            fixtureContainer.appendChild(tableWrapper);
+
+        } else {
+            // 🔹 Buscar en la hoja deportes
+            fixture = data.deportes.filter(item =>
+                normalize(item.Nivel) === normalize(nivel) &&
+                normalize(item.Deporte) === normalize(deporte)
+            );
+
+            if (fixture.length === 0) {
+                fixtureContainer.innerHTML = '<div style="text-align: center; padding: 30px; color: #666; font-size: 1.1rem;">📅 No hay partidos programados para este deporte y nivel.</div>';
+                return;
+            }
+
+            const table = document.createElement('table');
+            table.classList.add('fixture-table');
+
+            const headerRow = document.createElement('tr');
+            const thColor = nivel === 'basico'
+                ? 'linear-gradient(135deg, #044b97, #3742fa)'
+                : 'linear-gradient(135deg, #b60909, #ff4757)';
+
+            ['🕐 Hora', 'Equipo 1', 'Equipo 2', '📍 Lugar', '🏆 Ganador'].forEach(text => {
+                const th = document.createElement('th');
+                th.innerText = text;
+                th.style.background = thColor;
+                headerRow.appendChild(th);
+            });
+
+            table.appendChild(headerRow);
+
+            fixture.forEach(match => {
+                const row = document.createElement('tr');
+                const hora = formatHora(match.Hora);
+                [hora, match.equipo1, match.equipo2, match.Lugar, match.Ganador || '-'].forEach((value, index) => {
+                    const td = document.createElement('td');
+
+                    if (index === 4 && value !== '-') {
+                        td.style.fontWeight = 'bold';
+                        td.style.color = '#27ae60';
+                        td.innerHTML = `🏆 ${value}`;
+                    } else {
+                        td.innerText = value;
+                    }
+
+                    row.appendChild(td);
+                });
+
+                table.appendChild(row);
+            });
+
+            const tableWrapper = document.createElement('div');
+            tableWrapper.classList.add('fixture-table-container');
+            tableWrapper.appendChild(table);
+            fixtureContainer.innerHTML = '';
+            fixtureContainer.appendChild(tableWrapper);
+        }
     };
 
     if (cachedData) {
@@ -173,3 +223,5 @@ function loadFixture(nivel, deporte) {
             });
     }
 }
+
+
