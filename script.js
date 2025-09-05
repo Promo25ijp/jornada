@@ -2,7 +2,7 @@ const countdownOverlay = document.getElementById('countdown-overlay');
 const countdownEl = document.getElementById('countdown');
 const mainContent = document.querySelector('.container');
 
-const fechaEvento = new Date('2025-09-17T07:00:00');
+const fechaEvento = new Date('2025-09-05T07:00:00');
 
 function actualizarCuentaRegresiva() {
     const ahora = new Date();
@@ -100,23 +100,25 @@ function loadFixture(nivel, deporte) {
     fixtureContainer.innerHTML = '<div style="text-align: center; padding: 20px;"><div class="loading"></div></div>';
     fixtureContainer.style.display = 'block';
 
-    const apiURL = 'https://script.google.com/macros/s/AKfycbywb_9ztAsdJlGg-Djxw7BVE3lOIopMEdsyJSliYkP9V-d90q7X2Pnb9SSwGQsPv2Vd/exec'; // 👈 pegá tu URL de Apps Script publicado
+    const apiURL = 'https://script.google.com/macros/s/AKfycbywb_9ztAsdJlGg-Djxw7BVE3lOIopMEdsyJSliYkP9V-d90q7X2Pnb9SSwGQsPv2Vd/exec';
 
     const renderFixture = (data) => {
         let fixture = [];
 
-        if (normalize(deporte) === normalize("Show de talentos")) {
-            // 🔹 Buscar en la hoja talentos
+        const deporteNormalizado = normalize(deporte);
+        const esEventoEspecial = ["show de talentos", "concurso de dibujo"].includes(deporteNormalizado);
+
+        if (esEventoEspecial) {
             fixture = data.talentos.filter(item =>
-                normalize(item.Nivel) === normalize(nivel)
+                normalize(item.Nivel) === normalize(nivel) &&
+                normalize(item.talento) === deporteNormalizado
             );
 
             if (fixture.length === 0) {
-                fixtureContainer.innerHTML = '<div style="text-align: center; padding: 30px; color: #666; font-size: 1.1rem;">📅 No hay presentaciones programadas para este nivel.</div>';
+                fixtureContainer.innerHTML = '<div style="text-align: center; padding: 30px; color: #666; font-size: 1.1rem;">📅 No hay presentaciones programadas para este evento y nivel.</div>';
                 return;
             }
 
-            // Crear tabla para talentos
             const table = document.createElement('table');
             table.classList.add('fixture-table');
 
@@ -152,10 +154,9 @@ function loadFixture(nivel, deporte) {
             fixtureContainer.appendChild(tableWrapper);
 
         } else {
-            // 🔹 Buscar en la hoja deportes
             fixture = data.deportes.filter(item =>
                 normalize(item.Nivel) === normalize(nivel) &&
-                normalize(item.Deporte) === normalize(deporte)
+                normalize(item.Deporte) === deporteNormalizado
             );
 
             if (fixture.length === 0) {
@@ -223,5 +224,3 @@ function loadFixture(nivel, deporte) {
             });
     }
 }
-
-
