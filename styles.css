@@ -4,9 +4,12 @@
     box-sizing: border-box;
 }
 
+#main-content {
+  display: none;
+}
+
 body {
     font-family: 'Poppins', sans-serif;
-    background-attachment: fixed;
     margin: 0;
     padding: 20px;
     min-height: 100vh;
@@ -15,9 +18,12 @@ body {
     justify-content: center;
     align-items: center;
     position: relative;
+
+    /* 👇 al inicio SIN fondo */
+    background: none;
 }
 
-body::before {
+body.show-background::before {
     content: '';
     position: fixed;
     top: 0;
@@ -94,7 +100,6 @@ h1::after {
     height: 4px;
     background: linear-gradient(135deg, #b60909, #ff4757);
     border-radius: 2px;
-    
 }
 
 #countdown-overlay h1::after {
@@ -321,6 +326,42 @@ h1::after {
     to { transform: rotate(360deg); }
 }
 
+/* ✅ Intro Overlay - una sola versión */
+#intro-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: black;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  opacity: 0;                  /* arranca oculto */
+  pointer-events: none;
+  transition: opacity 1s ease;
+  overflow: hidden;
+}
+
+#intro-overlay.active {
+  opacity: 1;                  /* visible */
+  pointer-events: all;
+}
+
+/* 🎥 Video (solo PC) */
+#intro-video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;   /* llena la pantalla */
+  display: block;
+}
+
+/* 🖼️ GIF oculto en PC */
+#intro-gif {
+  display: none;
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+
 @media (max-width: 768px) {
     .container {
         width: 95%;
@@ -341,6 +382,19 @@ h1::after {
     .deportes {
         grid-template-columns: 1fr;
     }
+
+    /* 👇 en móvil ocultamos el video */
+    #intro-video {
+      display: none;
+    }
+  #intro-gif {
+    display: block; /* mostrar gif */
+  }
+    #intro-overlay {
+    background: linear-gradient(135deg, #000d24, #021942, #022561, #03348a);
+    background-size: 400% 400%;
+    animation: gradientBG 12s ease infinite;
+  }
 }
 
 @media (max-width: 480px) {
