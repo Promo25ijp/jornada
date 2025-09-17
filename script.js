@@ -1,7 +1,7 @@
 // =====================
 // CONTADOR + INTRO (video en PC / GIF en móvil)
 // =====================
-const fechaEvento = new Date('2025-09-15T17:08:00');
+const fechaEvento = new Date('2025-09-17T07:00:00');
 let cuentaTerminada = false;
 
 const countdownOverlay = document.getElementById('countdown-overlay');
