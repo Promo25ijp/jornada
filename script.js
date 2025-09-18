@@ -115,16 +115,20 @@ function toggleDeportes(nivel) {
 function loadDeportes(nivel) {
     deportesContainer.innerHTML = '';
 
-    const deportes = [
+    let deportes = [
         { nombre: "Fútbol masculino", emoji: "⚽" },
         { nombre: "Fútbol femenino", emoji: "⚽" },
         { nombre: "Vóley", emoji: "🏐" },
         { nombre: "Handball", emoji: "🤾" },
         { nombre: "Básquet", emoji: "🏀" },
         { nombre: "Pata Tenis", emoji: "👟" },
-        { nombre: "Torneo de Counter Strike", emoji: "🔫" },
         { nombre: "Show de talentos", emoji: "🌟" }
     ];
+
+    // 👇 Handball solo disponible en ciclo básico
+    if (nivel === "orientado") {
+        deportes = deportes.filter(d => d.nombre !== "Handball");
+    }
 
     deportes.forEach(deporte => {
         const div = document.createElement('div');
@@ -139,6 +143,7 @@ function loadDeportes(nivel) {
         deportesContainer.appendChild(div);
     });
 }
+
 
 function normalize(str) {
     return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
