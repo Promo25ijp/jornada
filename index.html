@@ -6,7 +6,7 @@
     <title>Jornada Deportiva</title>
     <link rel="shortcut icon" href="./img/ijp.jpg" type="image/x-icon">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="styles.css?v=2">
+    <link rel="stylesheet" href="styles.css?v=3">
 </head>
 <body>
 
@@ -30,10 +30,21 @@
                 <h2>Ciclo Orientado</h2>
             </div>
         </div>
+        <div id="dias-container"></div>
         <div id="deportes" class="deportes"></div>
         <div id="fixture" class="fixture"></div>
     </div>
 
-    <script src="script.js?v=2"></script>
+    <!-- Overlay GANADOR -->
+<div id="winner-overlay">
+  <div class="winner-content">
+    <div class="trophy">🏆</div>
+    <h1 class="winner-title"></h1>
+    <h2 class="winner-name" id="winner-name">Nombre del equipo</h2>
+  </div>
+</div>
+
+
+    <script src="script.js?v=3"></script>
 </body>
 </html>

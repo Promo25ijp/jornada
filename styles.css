@@ -235,6 +235,9 @@ h1::after {
     display: none;
     margin-top: 40px;
     animation: slideInUp 0.5s ease-out;
+    justify-content: center;
+    align-items: center;
+    overflow-wrap:anywhere;
 }
 
 @keyframes slideInUp {
@@ -257,34 +260,31 @@ h1::after {
 }
 
 .fixture-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin: 0;
-    background-color: white;
-    border-radius: 15px;
-    overflow: hidden;
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed; /* 👈 fuerza mismo ancho para todas las columnas */
 }
 
-.fixture-table th {
-    color: white;
-    padding: 20px 15px;
-    text-align: center;
-    font-weight: 600;
-    font-size: 0.95rem;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    border: none;
-    position: relative;
-}
-
+.fixture-table th,
 .fixture-table td {
-    padding: 18px 15px;
-    text-align: center;
-    border: none;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-    font-weight: 400;
-    transition: all 0.2s ease;
+  padding: 10px;
+  text-align: center;
+  word-wrap: break-word;
+  border: 1px solid #ccc;
+  color: rgb(8, 8, 8);
+  background-color: #f5f5f5;
 }
+
+.fixture-table th:nth-child(1),
+.fixture-table td:nth-child(1) {
+  width: 50px; /* 👈 le das un ancho mínimo fijo a la columna de hora */
+}
+
+.fixture-table th:nth-child(5),
+.fixture-table td:nth-child(5) {
+  width: 50px; /* 👈 le das un ancho mínimo fijo a la columna de hora */
+}
+
 
 .fixture-table tr:hover td {
     background-color: rgba(102, 126, 234, 0.05);
@@ -354,7 +354,7 @@ h1::after {
   display: block;
 }
 
-/* 🖼️ GIF oculto en PC */
+/* 🖼 GIF oculto en PC */
 #intro-gif {
   display: none;
   max-width: 100%;
@@ -464,4 +464,115 @@ h1::after {
     border-radius: 15px;
     box-shadow: 0 0 25px rgba(255, 255, 255, 0.15);
     letter-spacing: 3px;
+}
+
+/* =====================
+   GANADOR OVERLAY
+===================== */
+#winner-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.85);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 10000;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.8s ease;
+}
+
+#winner-overlay.active {
+  opacity: 1;
+  pointer-events: all;
+}
+
+.winner-content {
+  text-align: center;
+  animation: scaleUp 1s ease forwards;
+}
+
+.trophy {
+  font-size: 5rem;
+  animation: bounce 1.5s infinite;
+}
+
+.winner-title {
+  font-size: 4rem;
+  font-weight: 800;
+  color: #FFD700;
+  text-shadow: 0 0 20px #FFD700, 0 0 40px #ff9f1c;
+  margin: 20px 0 10px;
+  animation: glow 2s infinite alternate;
+}
+
+.winner-name {
+  font-size: 2.5rem;
+  font-weight: 600;
+  color: #fff;
+  text-shadow: 0 0 15px #00c3ff, 0 0 25px #007bff;
+  animation: fadeInUp 1.2s ease forwards;
+}
+
+/* Animaciones */
+@keyframes scaleUp {
+  from { transform: scale(0.5); opacity: 0; }
+  to   { transform: scale(1); opacity: 1; }
+}
+
+@keyframes bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+@keyframes glow {
+  from { text-shadow: 0 0 15px #FFD700, 0 0 30px #ff9f1c; }
+  to   { text-shadow: 0 0 25px #fff27a, 0 0 50px #ffb347; }
+}
+
+#dias-container {
+  text-align: center;
+  margin: 20px 0;
+}
+
+#dias-container .day-btn {
+  background: #f1f1f1;
+  border: none;
+  margin: 0 8px;
+  padding: 14px 22px;       /* 👈 más grandes */
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.3s;
+  font-size: 18px;          /* 👈 más grandes */
+  font-weight: 500;
+}
+
+#dias-container .day-btn:hover {
+  background: #ddd;
+}
+
+/* Activo en ciclo básico (azul) */
+#dias-container.basico .day-btn.active {
+  background: linear-gradient(135deg, #044b97, #3742fa);
+  color: white;
+  font-weight: bold;
+  box-shadow: 0 3px 8px rgba(0,0,0,0.2);
+}
+
+/* Activo en ciclo orientado (rojo) */
+#dias-container.orientado .day-btn.active {
+  background: linear-gradient(135deg, #b60909, #ff4757);
+  color: white;
+  font-weight: bold;
+  box-shadow: 0 3px 8px rgba(0,0,0,0.2);
+}
+
+/* Espaciado entre fases y tablas */
+#fixture h3 {
+  margin: 40px 0 20px 0;   /* 👈 más aire arriba y abajo */
+  font-size: 20px;
+}
+
+.fixture-table {
+  margin: 0 auto 40px auto; /* 👈 más espacio debajo de cada tabla */
 }

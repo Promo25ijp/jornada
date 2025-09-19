@@ -1,6 +1,3 @@
-// =====================
-// CONTADOR + INTRO (video en PC / GIF en móvil)
-// =====================
 const fechaEvento = new Date('2025-09-17T07:00:00');
 let cuentaTerminada = false;
 
@@ -9,19 +6,16 @@ const countdownEl = document.getElementById('countdown');
 const introOverlay = document.getElementById('intro-overlay');
 const mainContent = document.querySelector('.container');
 
-// Función para detectar si es móvil
 function isMobile() {
     return /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent);
 }
 
-// Función para iniciar intro
 function iniciarIntro() {
     cuentaTerminada = true;
-
     countdownOverlay.style.opacity = '0';
+
     setTimeout(() => {
         countdownOverlay.style.display = 'none';
-        
         introOverlay.classList.add("active");
 
         if (!isMobile()) {
@@ -38,12 +32,9 @@ function iniciarIntro() {
                 mainContent.style.display = 'flex';
                 document.body.classList.add('show-background');
             });
-
         } else {
-            // Reiniciar gif
             const gif = document.getElementById('intro-gif');
             gif.src = gif.src.split("?")[0] + "?" + new Date().getTime();
-
             setTimeout(() => {
                 introOverlay.classList.remove("active");
                 mainContent.style.display = 'flex';
@@ -53,7 +44,6 @@ function iniciarIntro() {
     }, 500);
 }
 
-// Función para actualizar cuenta regresiva
 function actualizarCuentaRegresiva() {
     if (cuentaTerminada) return;
 
@@ -74,9 +64,7 @@ function actualizarCuentaRegresiva() {
     countdownEl.innerHTML = `${dias}d ${horas}h ${minutos}m ${segundos}s`;
 }
 
-// Inicialización
 mainContent.style.display = 'none';
-
 if (new Date() >= fechaEvento) {
     iniciarIntro();
 } else {
@@ -90,6 +78,7 @@ if (new Date() >= fechaEvento) {
 const container = document.querySelector('.container');
 const deportesContainer = document.getElementById('deportes');
 const fixtureContainer = document.getElementById('fixture');
+const diasContainer = document.getElementById('dias-container'); // 👈 div vacío en el HTML para los botones
 
 let cicloActivo = null;
 
@@ -97,8 +86,17 @@ document.getElementById('ciclo-basico').addEventListener('click', () => toggleDe
 document.getElementById('ciclo-orientado').addEventListener('click', () => toggleDeportes('orientado'));
 
 function toggleDeportes(nivel) {
+    // Si ya hay un ciclo activo distinto, limpiamos primero
+    if (cicloActivo && cicloActivo !== nivel) {
+        diasContainer.innerHTML = '';
+        deportesContainer.innerHTML = '';
+        fixtureContainer.innerHTML = '';
+        fixtureContainer.style.display = 'none';
+    }
+
     if (cicloActivo === nivel) {
         cicloActivo = null;
+        diasContainer.innerHTML = '';
         deportesContainer.innerHTML = '';
         fixtureContainer.innerHTML = '';
         fixtureContainer.style.display = 'none';
@@ -106,13 +104,33 @@ function toggleDeportes(nivel) {
     } else {
         cicloActivo = nivel;
         container.classList.add('expanded');
-        loadDeportes(nivel);
         fixtureContainer.innerHTML = '';
         fixtureContainer.style.display = 'none';
+        loadDias(nivel);
     }
 }
 
-function loadDeportes(nivel) {
+
+function loadDias(nivel) {
+    diasContainer.innerHTML = '';
+    diasContainer.className = nivel;
+
+    const diasDisponibles = nivel === "basico" ? ["miercoles", "jueves"] : ["miercoles", "viernes"];
+
+    diasDisponibles.forEach(dia => {
+        const btn = document.createElement("button");
+        btn.innerText = dia.charAt(0).toUpperCase() + dia.slice(1);
+        btn.classList.add("day-btn");
+        btn.addEventListener("click", () => {
+            diasContainer.querySelectorAll("button").forEach(b => b.classList.remove("active"));
+            btn.classList.add("active");
+            loadDeportes(nivel, dia);
+        });
+        diasContainer.appendChild(btn);
+    });
+}
+
+function loadDeportes(nivel, diaSeleccionado) {
     deportesContainer.innerHTML = '';
 
     let deportes = [
@@ -125,7 +143,6 @@ function loadDeportes(nivel) {
         { nombre: "Show de talentos", emoji: "🌟" }
     ];
 
-    // 👇 Handball solo disponible en ciclo básico
     if (nivel === "orientado") {
         deportes = deportes.filter(d => d.nombre !== "Handball");
     }
@@ -135,7 +152,7 @@ function loadDeportes(nivel) {
         div.className = `deporte ${nivel}`;
         div.innerHTML = `<span>${deporte.emoji} ${deporte.nombre}</span>`;
         div.addEventListener('click', () => {
-            loadFixture(nivel, deporte.nombre);
+            loadFixture(nivel, deporte.nombre, diaSeleccionado);
             setTimeout(() => {
                 fixtureContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
             }, 350);
@@ -143,7 +160,6 @@ function loadDeportes(nivel) {
         deportesContainer.appendChild(div);
     });
 }
-
 
 function normalize(str) {
     return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
@@ -158,33 +174,31 @@ function formatHora(fechaString) {
 
 let cachedData = null;
 
-function loadFixture(nivel, deporte) {
+function loadFixture(nivel, deporte, dia) {
     fixtureContainer.innerHTML = '<div style="text-align: center; padding: 20px;"><div class="loading"></div></div>';
     fixtureContainer.style.display = 'block';
 
     const apiURL = 'https://script.google.com/macros/s/AKfycbyFEG-LLZa4yiHslCYXKoum5YdBYx95e4eUYd8Jrr4AVrirkt3zhONUxYxNl0T1g-N4/exec';
 
     const renderFixture = (data) => {
-        let fixture = [];
-
         const deporteNormalizado = normalize(deporte);
         const esEventoEspecial = ["show de talentos", "concurso de dibujo"].includes(deporteNormalizado);
 
+        fixtureContainer.innerHTML = '';
+
         if (esEventoEspecial) {
-            // 🎭 EVENTOS ESPECIALES
-            fixture = data.talentos.filter(item =>
+            const fixture = data.talentos.filter(item =>
                 normalize(item.Nivel) === normalize(nivel) &&
                 normalize(item.talento) === deporteNormalizado
             );
 
             if (fixture.length === 0) {
-                fixtureContainer.innerHTML = '<div style="text-align: center; padding: 30px; color: #666; font-size: 1.1rem;">📅 No hay presentaciones programadas para este evento y nivel.</div>';
+                fixtureContainer.innerHTML = '<div style="text-align: center; padding: 30px; color: #666; font-size: 1.1rem;">📅 No hay presentaciones programadas.</div>';
                 return;
             }
 
             const table = document.createElement('table');
             table.classList.add('fixture-table');
-
             const headerRow = document.createElement('tr');
             const thColor = nivel === 'basico'
                 ? 'linear-gradient(135deg, #044b97, #3742fa)'
@@ -196,7 +210,6 @@ function loadFixture(nivel, deporte) {
                 th.style.background = thColor;
                 headerRow.appendChild(th);
             });
-
             table.appendChild(headerRow);
 
             fixture.forEach(show => {
@@ -210,53 +223,50 @@ function loadFixture(nivel, deporte) {
                 table.appendChild(row);
             });
 
-            const tableWrapper = document.createElement('div');
-            tableWrapper.classList.add('fixture-table-container');
-            tableWrapper.appendChild(table);
-            fixtureContainer.innerHTML = '';
-            fixtureContainer.appendChild(tableWrapper);
-
+            fixtureContainer.appendChild(table);
         } else {
-            // ⚽ DEPORTES NORMALES — AGRUPADO POR DÍA
-            const dias = ["miercoles", "jueves", "viernes"];
-            fixtureContainer.innerHTML = '';
+            const fixtureDia = data.deportes.filter(item =>
+                normalize(item.Nivel) === normalize(nivel) &&
+                normalize(item.Deporte) === deporteNormalizado &&
+                normalize(item.Dia) === dia
+            );
 
-            dias.forEach(dia => {
-                const fixtureDia = data.deportes.filter(item =>
-                    normalize(item.Nivel) === normalize(nivel) &&
-                    normalize(item.Deporte) === deporteNormalizado &&
-                    normalize(item.Dia) === dia
-                );
+            if (fixtureDia.length === 0) {
+                fixtureContainer.innerHTML = '<div style="text-align: center; padding: 30px; color: #666;">📅 No hay partidos para este día.</div>';
+                return;
+            }
 
-                if (fixtureDia.length > 0) {
-                    const tituloDia = document.createElement('h3');
-                    tituloDia.innerText = `📅 ${dia.charAt(0).toUpperCase() + dia.slice(1)}`;
-                    tituloDia.style.textAlign = "center";
-                    tituloDia.style.margin = "20px 0 10px 0";
-                    fixtureContainer.appendChild(tituloDia);
+            const fases = ["fase de grupos", "semifinal", "final"];
+            fases.forEach(fase => {
+                const partidosFase = fixtureDia.filter(m => m.fase && normalize(m.fase) === normalize(fase));
 
-                    const table = document.createElement('table');
-                    table.classList.add('fixture-table');
+                if (partidosFase.length > 0) {
+                    const tituloFase = document.createElement("h3");
+                    tituloFase.innerText = `🏅 ${fase.charAt(0).toUpperCase() + fase.slice(1)}`;
+                    tituloFase.style.textAlign = "center";
+                    fixtureContainer.appendChild(tituloFase);
 
-                    const headerRow = document.createElement('tr');
+                    const table = document.createElement("table");
+                    table.classList.add("fixture-table");
+
+                    const headerRow = document.createElement("tr");
                     const thColor = nivel === 'basico'
                         ? 'linear-gradient(135deg, #044b97, #3742fa)'
                         : 'linear-gradient(135deg, #b60909, #ff4757)';
 
-                    ['🕐 Hora', 'Equipo 1', 'Equipo 2', '📍 Lugar', '🏆 Ganador'].forEach(text => {
+                    ['🕐', 'Equipo 1', 'Equipo 2', '📍 Lugar', '🏆'].forEach(text => {
                         const th = document.createElement('th');
                         th.innerText = text;
                         th.style.background = thColor;
                         headerRow.appendChild(th);
                     });
-
                     table.appendChild(headerRow);
 
-                    fixtureDia.forEach(match => {
-                        const row = document.createElement('tr');
+                    partidosFase.forEach(match => {
+                        const row = document.createElement("tr");
                         const hora = formatHora(match.Hora);
-                        [hora, match.equipo1, match.equipo2, match.Lugar, match.Ganador || '-'].forEach((value, index) => {
-                            const td = document.createElement('td');
+                        [hora, match.equipo1, match.equipo2, match.Lugar, match.Ganador || "-"].forEach((value, index) => {
+                            const td = document.createElement("td");
                             if (index === 4 && value !== '-') {
                                 td.style.fontWeight = 'bold';
                                 td.style.color = '#27ae60';
@@ -267,25 +277,26 @@ function loadFixture(nivel, deporte) {
                             row.appendChild(td);
                         });
                         table.appendChild(row);
+
+                        if (match.fase) {
+                            if (match.fase.toLowerCase().includes("semifinal")) {
+                                const semifinales = partidosFase;
+                                if (semifinales.length > 0) {
+                                    let texto = "Semifinales\n\n";
+                                    semifinales.forEach(sf => {
+                                        texto += `${sf.equipo1} vs ${sf.equipo2}\n\n`;
+                                    });
+                                    mostrarGanador(texto.trim());
+                                }
+                            } else if (match.fase.toLowerCase().includes("final") && match.Ganador && match.Ganador !== '-') {
+                                mostrarGanador(`Ganador\n${match.Ganador}`);
+                            }
+                        }
                     });
 
-                    const tableWrapper = document.createElement('div');
-                    tableWrapper.classList.add('fixture-table-container');
-                    tableWrapper.appendChild(table);
-                    fixtureContainer.appendChild(tableWrapper);
+                    fixtureContainer.appendChild(table);
                 }
             });
-
-            // Si no hay partidos en ningún día
-            if (!dias.some(dia =>
-                data.deportes.some(item =>
-                    normalize(item.Nivel) === normalize(nivel) &&
-                    normalize(item.Deporte) === deporteNormalizado &&
-                    normalize(item.Dia) === dia
-                )
-            )) {
-                fixtureContainer.innerHTML = '<div style="text-align: center; padding: 30px; color: #666; font-size: 1.1rem;">📅 Por ahora no hay partidos cargados para este deporte y nivel.</div>';
-            }
         }
     };
 
@@ -293,30 +304,29 @@ function loadFixture(nivel, deporte) {
         setTimeout(() => renderFixture(cachedData), 300);
     } else {
         fetch(apiURL)
-            .then(response => response.json())
-.then(data => {
-    // Unificamos miercoles, jueves y viernes en un solo array
-    const dias = ["miercoles", "jueves", "viernes"];
-    let deportesConDia = [];
-
-    dias.forEach(dia => {
-        if (data[dia]) {
-            const registros = data[dia].map(item => ({
-                ...item,
-                Dia: dia // 👈 agregamos el campo Dia
-            }));
-            deportesConDia = deportesConDia.concat(registros);
-        }
-    });
-
-    // Guardamos la nueva estructura
-    cachedData = {
-        deportes: deportesConDia,
-        talentos: data.talentos || []
-    };
-
-    setTimeout(() => renderFixture(cachedData), 300);
-})
-
+            .then(r => r.json())
+            .then(data => {
+                const dias = ["miercoles", "jueves", "viernes"];
+                let deportesConDia = [];
+                dias.forEach(dia => {
+                    if (data[dia]) {
+                        const registros = data[dia].map(item => ({ ...item, Dia: dia }));
+                        deportesConDia = deportesConDia.concat(registros);
+                    }
+                });
+                cachedData = { deportes: deportesConDia, talentos: data.talentos || [] };
+                setTimeout(() => renderFixture(cachedData), 300);
+            });
     }
+}
+
+// =====================
+// GANADOR OVERLAY
+// =====================
+function mostrarGanador(texto) {
+    const overlay = document.getElementById("winner-overlay");
+    const nameEl = document.getElementById("winner-name");
+    nameEl.innerHTML = texto.replace(/\n/g, "<br>");
+    overlay.classList.add("active");
+    setTimeout(() => overlay.classList.remove("active"), 3000);
 }
