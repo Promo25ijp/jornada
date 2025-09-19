@@ -263,36 +263,53 @@ function loadFixture(nivel, deporte, dia) {
                     table.appendChild(headerRow);
 
                     partidosFase.forEach(match => {
-                        const row = document.createElement("tr");
-                        const hora = formatHora(match.Hora);
-                        [hora, match.equipo1, match.equipo2, match.Lugar, match.Ganador || "-"].forEach((value, index) => {
-                            const td = document.createElement("td");
-                            if (index === 4 && value !== '-') {
-                                td.style.fontWeight = 'bold';
-                                td.style.color = '#27ae60';
-                                td.innerHTML = `🏆 ${value}`;
-                            } else {
-                                td.innerText = value;
-                            }
-                            row.appendChild(td);
-                        });
-                        table.appendChild(row);
+    const row = document.createElement("tr");
+    const hora = formatHora(match.Hora);
+    [hora, match.equipo1, match.equipo2, match.Lugar, match.Ganador || "-"].forEach((value, index) => {
+        const td = document.createElement("td");
+        if (index === 4 && value !== '-') {
+            td.style.fontWeight = 'bold';
+            td.style.color = '#27ae60';
+            td.innerHTML = `🏆 ${value}`;
+        } else {
+            td.innerText = value;
+        }
+        row.appendChild(td);
+    });
+    table.appendChild(row);
+});
 
-                        if (match.fase) {
-                            if (match.fase.toLowerCase().includes("semifinal")) {
-                                const semifinales = partidosFase;
-                                if (semifinales.length > 0) {
-                                    let texto = "Semifinales\n\n";
-                                    semifinales.forEach(sf => {
-                                        texto += `${sf.equipo1} vs ${sf.equipo2}\n\n`;
-                                    });
-                                    mostrarGanador(texto.trim());
-                                }
-                            } else if (match.fase.toLowerCase().includes("final") && match.Ganador && match.Ganador !== '-') {
-                                mostrarGanador(`Ganador\n${match.Ganador}`);
-                            }
-                        }
-                    });
+// ===== PRIORIDAD ANIMACIONES =====
+let animacionMostrada = false;
+
+// Primero, buscamos un ganador
+const ganador = partidosFase.find(m => m.Ganador && m.Ganador !== '-');
+if (ganador) {
+    mostrarGanador(`Ganador\n${ganador.Ganador}`);
+    animacionMostrada = true;
+}
+
+// Si no hay ganador, buscamos la final
+if (!animacionMostrada) {
+    const final = partidosFase.find(m => normalize(m.fase) === "final");
+    if (final) {
+        mostrarGanador(`Final\n\n${final.equipo1} vs ${final.equipo2}`);
+        animacionMostrada = true;
+    }
+}
+
+// Si no hay final ni ganador, mostramos semifinales
+if (!animacionMostrada) {
+    const semifinales = partidosFase.filter(m => normalize(m.fase).includes("semifinal"));
+    if (semifinales.length > 0) {
+        let texto = "Semifinales\n\n";
+        semifinales.forEach(sf => {
+            texto += `${sf.equipo1} vs ${sf.equipo2}\n\n`;
+        });
+        mostrarGanador(texto.trim());
+    }
+}
+
 
                     fixtureContainer.appendChild(table);
                 }
