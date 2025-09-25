@@ -87,6 +87,7 @@ document.getElementById('ciclo-orientado').addEventListener('click', () => toggl
 
 function toggleDeportes(nivel) {
     if (cicloActivo && cicloActivo !== nivel) {
+videosContainer.style.display = 'none';
         diasContainer.innerHTML = '';
         deportesContainer.innerHTML = '';
         fixtureContainer.innerHTML = '';
@@ -357,4 +358,131 @@ function mostrarGanador(texto) {
     nameEl.innerHTML = texto.replace(/\n/g, "<br>");
     overlay.classList.add("active");
     setTimeout(() => overlay.classList.remove("active"), 3000);
+}
+
+const videosBtn = document.getElementById("ciclo-videos");
+const videosContainer = document.getElementById("videos-container");
+
+videosBtn.addEventListener("click", () => {
+    cicloActivo = "videos";
+
+    diasContainer.innerHTML = '';
+    deportesContainer.innerHTML = '';
+    fixtureContainer.innerHTML = '';
+    fixtureContainer.style.display = 'none';
+
+    videosContainer.style.display = 'block';
+    mainContent.classList.add("expanded");
+
+    mostrarVideos();
+});
+
+function mostrarVideos() {
+    const secciones = [
+        {
+            titulo: "Fase de Grupos",
+            videos: [
+                {
+                    titulo: "Elfbar FC vs Atlético Paramesta",
+                    url: "https://www.youtube.com/embed/E7prY_-6Ka8?si=00Eh5XsikKzb-DLa"
+                },
+                {
+                    titulo: "La Parrilla vs Atlético Paramesta",
+                    url: "https://www.youtube.com/embed/IthZ0LHKakE?si=O9g7ZeLyRetQUjE9"
+                },
+                {
+                    titulo: "El Maniaca vs Los Trapitos",
+                    url: "https://www.youtube.com/embed/SiO-RuNKhq0?si=BGEFYK8BKXVh6l1a"
+                },
+                {
+                    titulo: "Chiche FC vs Brancategui",
+                    url: "https://www.youtube.com/embed/sT6qZiZ9-_g?si=5_nQANN3g6BM_yTL"
+                },
+                {
+                    titulo: "La Parrilla vs Elfbar",
+                    url: "https://www.youtube.com/embed/k-GI_3q_dAU?si=CvS0T9PpF5acqzuo"
+                },
+                {
+                    titulo: "Los Trapitos vs Ignite FC",
+                    url: "https://www.youtube.com/embed/h3Ndb00L8AE?si=HYprct0uiNbZxVt4"
+                },
+                {
+                    titulo: "Sector L vs Ceballos FC",
+                    url: "https://www.youtube.com/embed/IvzwAQTmoTE?si=lDMLrAPSunfqvsBz"
+                }
+            ]
+        },
+        {
+            titulo: "Semifinales",
+            videos: [
+                {
+                    titulo: "Sector L vs Choricheto",
+                    url: "https://www.youtube.com/embed/IydVdGQDw7I?si=FLHezV6AWjPmcoRD"
+                },
+                {
+                    titulo: "Dreams FC vs Varela Juniors",
+                    url: "https://www.youtube.com/embed/QRXjHomty4o?si=YxD38j_FPpCshGu0"
+                },
+                {
+                    titulo: "La Parrilla vs Brancategui",
+                    url: "https://www.youtube.com/embed/_iptVMyaxJQ?si=dbLPa1l_QwuEs-tM"
+                }
+            ]
+        },
+        {
+            titulo: "Finales",
+            videos: [
+                {
+                    titulo: "Dreams FC vs Las Casi Gol",
+                    url: "https://www.youtube.com/embed/66tspjgSFVw?si=ik1EPJ7nqjbsEFEJ"
+                },
+                {
+                    titulo: "La Parrilla vs Choricheto",
+                    url: "https://www.youtube.com/embed/p6GapHzHQs8?si=pMDrI-xT1VeLOD00"
+                }
+            ]
+        }
+    ];
+
+    videosContainer.innerHTML = '';
+
+    secciones.forEach(seccion => {
+        const sectionDiv = document.createElement("div");
+        sectionDiv.classList.add("video-section");
+
+        const title = document.createElement("h3");
+        title.innerText = seccion.titulo;
+        sectionDiv.appendChild(title);
+
+        const grid = document.createElement("div");
+        grid.classList.add("video-grid");
+
+        seccion.videos.forEach(video => {
+            const wrapper = document.createElement("div");
+            wrapper.style.marginBottom = "30px";
+
+            const caption = document.createElement("p");
+            caption.style.textAlign = "center";
+            caption.style.marginBottom = "8px";
+            caption.style.fontWeight = "600";
+            caption.style.fontSize = "1rem";
+            caption.innerText = video.titulo;
+
+            const iframe = document.createElement("iframe");
+            iframe.src = video.url;
+            iframe.allow = "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share";
+            iframe.allowFullscreen = true;
+            iframe.title = video.titulo;
+            iframe.style.width = "100%";
+            iframe.style.height = "315px";
+
+            wrapper.appendChild(caption);
+            wrapper.appendChild(iframe);
+
+            grid.appendChild(wrapper);
+        });
+
+        sectionDiv.appendChild(grid);
+        videosContainer.appendChild(sectionDiv);
+    });
 }
