@@ -576,3 +576,50 @@ h1::after {
 .fixture-table {
   margin: 0 auto 40px auto; /* 👈 más espacio debajo de cada tabla */
 }
+
+.ciclo.blanco {
+    background: white;
+    color: #333;
+    border: 2px solid #ccc;
+}
+
+.ciclo.blanco:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+}
+
+/* === Sección de videos === */
+.videos-container {
+    margin-top: 30px;
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+}
+
+.video-section {
+    padding: 20px;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.05);
+margin-bottom: 30px;
+}
+
+.video-section h3 {
+    font-size: 1.5rem;
+    margin-bottom: 15px;
+    text-align: center;
+    color: #333;
+}
+
+.video-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px;
+}
+
+.video-grid iframe {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    border-radius: 10px;
+    border: none;
+}
