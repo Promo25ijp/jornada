@@ -433,7 +433,7 @@ function mostrarVideos() {
             titulo: "Finales",
             videos: [
                 {
-                    titulo: "Dreams FC vs Las Casi Gol",
+                    titulo: "Dreams FC vs 9 de Oro",
                     url: "https://www.youtube.com/embed/66tspjgSFVw?si=ik1EPJ7nqjbsEFEJ"
                 },
                 {
